@@ -1,0 +1,5 @@
+node_modules
+.p2p*
+test.js
+plan.md
+.shareit
