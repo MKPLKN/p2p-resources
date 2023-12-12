@@ -1,2 +1,2 @@
 # p2p-resources
-Node JS library to manage p2p resources
+> This is an experimental package and is subject to significant changes, including potential breaking changes.
