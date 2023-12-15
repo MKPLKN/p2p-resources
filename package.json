@@ -25,7 +25,8 @@
     "hyperbee": "^2.16.0",
     "hypercore": "^10.30.0",
     "hyperdrive": "^11.6.2",
-    "inquirer": "^9.2.12"
+    "inquirer": "^9.2.12",
+    "p2p-auth": "^0.0.5"
   },
   "devDependencies": {
     "brittle": "^3.3.2",

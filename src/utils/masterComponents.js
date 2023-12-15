@@ -1,4 +1,4 @@
-import { Memory } from 'p2p-auth/src/utils/memory.js'
+import { Memory } from 'p2p-auth'
 import { getMasterStoragePath, makePrivateCore } from './cores.js'
 import { makeDatabase } from './databases.js'
 
