@@ -1,9 +1,6 @@
 import fs from 'fs/promises'
 import { test } from 'brittle'
-import { createUser } from 'p2p-auth'
-import authenticate from '../../src/auth/index.js'
-import { getKeyPair } from '../../src/utils/keyPair.js'
-import { getSeed } from '../../src/utils/seed.js'
+import { Memory, createUser } from 'p2p-auth'
 import { initMasterComponents, getMasterCore, getMasterDb } from '../../src/utils/masterComponents.js'
 import { clearCore, createCore, deleteCore, writeToCore } from '../../src/utils/cores.js'
 import { getConfig, setConfig } from '../../src/utils/config.js'
@@ -13,17 +10,15 @@ setConfig('resourcesLocation', './test/.p2p-resources')
 
 const username = 'username'
 const password = 'password'
-const { keyPair, seed } = await createUser({ username, password })
-const authFn = async () => Promise.resolve({ username, keyPair, seed })
+// This also stores the user's info into the Memory
+await createUser({ username, password })
 
 test('Workflow to manage resources', async (t) => {
-  // Authenticate the user
-  await authenticate(authFn)
-
-  t.ok(getKeyPair(), 'Key pair should be set after auth')
-  t.ok(getKeyPair('pubkey'), 'Public key should be set after auth')
-  t.ok(getKeyPair('secretKey'), 'Secret key should be set after auth')
-  t.ok(getSeed(), 'Seed should be set after auth')
+  // Testing the memory
+  t.ok(Memory.getKeyPair(), 'Key pair should be set after auth')
+  t.ok(Memory.getKeyPair('pubkey'), 'Public key should be set after auth')
+  t.ok(Memory.getKeyPair('secretKey'), 'Secret key should be set after auth')
+  t.ok(Memory.getSeed(), 'Seed should be set after auth')
 
   // Master components
   await initMasterComponents({ dbOpts: { keyEncoding: 'binary', valueEncoding: 'json' } })

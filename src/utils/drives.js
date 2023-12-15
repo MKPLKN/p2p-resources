@@ -1,8 +1,7 @@
 import Hyperdrive from 'hyperdrive'
 import { getChildStoragePath, getCorestore } from './cores.js'
 import goodbye from 'graceful-goodbye'
-import { generateChildKeyPair, generateEncryptionKeyFromKeyPair, getNextDerivedPath } from 'p2p-auth'
-import { getSeed } from './seed.js'
+import { Memory, generateChildKeyPair, generateEncryptionKeyFromKeyPair, getNextDerivedPath } from 'p2p-auth'
 import { deleteDirectory, toKebabCase, toTitleCase } from './helpers.js'
 
 const drives = new Map()
@@ -42,7 +41,7 @@ export async function createDrive (db, opts = {}) {
   const { name, encrypted } = opts
   const pathList = await db.getPathList()
   const path = getNextDerivedPath(pathList)
-  const keyPair = generateChildKeyPair(getSeed(), path)
+  const keyPair = generateChildKeyPair(Memory.getSeed(), path)
 
   const time = new Date().getTime()
   const details = {

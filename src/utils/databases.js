@@ -1,6 +1,5 @@
 import Hyperbee from 'hyperbee'
-import { generateChildKeyPair } from 'p2p-auth'
-import { getSeed } from './seed.js'
+import { generateChildKeyPair, Memory } from 'p2p-auth'
 import { getKeys, makeCore, makePrivateCore } from './cores.js'
 import goodbye from 'graceful-goodbye'
 import { makeDrive, makePrivateDrive } from './drives.js'
@@ -72,7 +71,7 @@ class HandyBee extends Hyperbee {
   async getDetails (resource = null) {
     const list = []
     for (const path of (await this.getJsonValue('derived-paths', []))) {
-      const keyPair = generateChildKeyPair(getSeed(), path)
+      const keyPair = generateChildKeyPair(Memory.getSeed(), path)
       const pubkey = keyPair.publicKey.toString('hex')
       const details = (await this.getJsonValue(`details:${pubkey}`))
       if (details && (!resource || details.resource === resource)) {
@@ -99,7 +98,7 @@ class HandyBee extends Hyperbee {
 
     this.resources = []
     for (const path of (await this.getJsonValue('derived-paths', []))) {
-      const keyPair = generateChildKeyPair(getSeed(), path)
+      const keyPair = generateChildKeyPair(Memory.getSeed(), path)
       const pubkey = keyPair.publicKey.toString('hex')
       const details = (await this.getJsonValue(`details:${pubkey}`))
       if (details && !details.deleted_at) {

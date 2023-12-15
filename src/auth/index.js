@@ -1,7 +1,4 @@
-import { authCLI } from 'p2p-auth'
-import { setKeyPair } from '../utils/keyPair.js'
-import { setSeed } from '../utils/seed.js'
-import { setUser } from '../utils/user.js'
+import { Memory, authCLI } from 'p2p-auth'
 
 /**
  * Authenticate the user.
@@ -13,11 +10,7 @@ import { setUser } from '../utils/user.js'
 const authenticate = async (authFn = null) => {
   try {
     const auth = authFn || authCLI
-    const { username, keyPair, seed } = await auth()
-
-    setUser(username)
-    setKeyPair(keyPair)
-    setSeed(seed)
+    const { keyPair, seed } = await auth()
 
     return { keyPair, seed }
   } catch (error) {

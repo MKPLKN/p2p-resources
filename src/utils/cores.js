@@ -1,14 +1,12 @@
 import Corestore from 'corestore'
-import { generateEncryptionKeyFromKeyPair, generateChildKeyPair, getNextDerivedPath } from 'p2p-auth'
-import { getSeed } from './seed.js'
+import { Memory, generateEncryptionKeyFromKeyPair, generateChildKeyPair, getNextDerivedPath } from 'p2p-auth'
 import { toKebabCase, toTitleCase } from './helpers.js'
 import { getConfig } from './config.js'
 import goodbye from 'graceful-goodbye'
-import { getUser } from './user.js'
 
 export function getDefaultStoragePath () {
   const prefix = getConfig('resourcesLocation', './.p2p-resources')
-  return `${prefix}/${getUser()}`
+  return `${prefix}/${Memory.getUsername()}`
 }
 
 export function getReaderStoragePath (path) {
@@ -93,7 +91,7 @@ export async function createCore (db, opts = {}) {
   const { name, encrypted } = opts
   const pathList = await db.getPathList()
   const path = getNextDerivedPath(pathList)
-  const keyPair = generateChildKeyPair(getSeed(), path)
+  const keyPair = generateChildKeyPair(Memory.getSeed(), path)
 
   const details = {
     type: 'keypair',

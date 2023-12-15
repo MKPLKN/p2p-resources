@@ -1,13 +1,13 @@
+import { Memory } from 'p2p-auth/src/utils/memory.js'
 import { getMasterStoragePath, makePrivateCore } from './cores.js'
 import { makeDatabase } from './databases.js'
-import { getKeyPair } from './keyPair.js'
 
 let masterCoreInstance = null
 let masterDbInstance = null
 
 export const initMasterComponents = async (opts = {}) => {
   const { coreOpts, dbOpts } = opts
-  const keyPair = getKeyPair()
+  const keyPair = Memory.getKeyPair()
 
   const masterCore = await makePrivateCore(getMasterStoragePath(), keyPair, coreOpts || {})
   const masterDb = await makeDatabase(masterCore, dbOpts || {})
