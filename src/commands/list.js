@@ -1,8 +1,8 @@
-import { getKeyPair } from '../utils/keyPair.js'
-import { getMasterComponents } from '../utils/masterComponents.js'
+const { Memory } = require('p2p-auth')
+const { getMasterComponents } = require('../utils/masterComponents.js')
 
 const listCommand = async () => {
-  console.log(`Listing all resources for ${getKeyPair('pubkey')}`)
+  console.log(`Listing all resources for ${Memory.getKeyPair('pubkey')}`)
 
   const { masterDb } = getMasterComponents()
   const resources = await masterDb.getResources()
@@ -11,4 +11,4 @@ const listCommand = async () => {
   console.log({ resources, details })
 }
 
-export default listCommand
+module.exports = { listCommand }

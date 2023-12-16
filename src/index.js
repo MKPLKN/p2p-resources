@@ -1,4 +1,4 @@
-import authenticate from './auth/index.js'
-import { initMasterComponents, getMasterComponents } from './utils/masterComponents.js'
+const authenticate = require('./auth/index.js')
+const { initMasterComponents, getMasterComponents } = require('./utils/masterComponents.js')
 
-export { authenticate, initMasterComponents, getMasterComponents }
+module.exports = { authenticate, initMasterComponents, getMasterComponents }

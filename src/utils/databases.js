@@ -1,10 +1,10 @@
-import Hyperbee from 'hyperbee'
-import { generateChildKeyPair, Memory } from 'p2p-auth'
-import { getKeys, makeCore, makePrivateCore } from './cores.js'
-import goodbye from 'graceful-goodbye'
-import { makeDrive, makePrivateDrive } from './drives.js'
+const Hyperbee = require('hyperbee')
+const { generateChildKeyPair, Memory } = require('p2p-auth')
+const { getKeys, makeCore, makePrivateCore } = require('./cores.js')
+const goodbye = require('graceful-goodbye')
+const { makeDrive, makePrivateDrive } = require('./drives.js')
 
-export async function makeDatabase (core, opts = {}) {
+async function makeDatabase (core, opts = {}) {
   const db = opts.handyBee === false ? new Hyperbee(core, opts) : new HandyBee(core, opts)
   await db.ready()
   goodbye(() => db.close())
@@ -131,4 +131,8 @@ class HandyBee extends Hyperbee {
     const rkey = typeof key === 'string' ? key : key.toString('hex')
     return (await this.getResources(opts)).find(r => r.details.resourceKey === rkey)
   }
+}
+
+module.exports = {
+  makeDatabase
 }

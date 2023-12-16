@@ -1,11 +1,10 @@
-import inquirer from 'inquirer'
-import { createCore } from '../utils/cores.js'
-import { getKeyPair } from '../utils/keyPair.js'
-import { getMasterDb } from '../utils/masterComponents.js'
-import { toKebabCase, toTitleCase } from '../utils/helpers.js'
-import { createDrive } from '../utils/drives.js'
+const inquirer = require('inquirer')
+const { getMasterDb } = require('../utils/masterComponents.js')
+const { toKebabCase, toTitleCase } = require('../utils/helpers.js')
+const { createDrive } = require('../utils/drives.js')
+const { Memory } = require('p2p-auth')
 
-export const createDriveCommand = async () => {
+const createDriveCommand = async () => {
   const masterDb = getMasterDb()
 
   const { name, encrypted } = await inquirer.prompt([
@@ -41,6 +40,8 @@ export const createDriveCommand = async () => {
 
   const { details, drive } = await createDrive(masterDb, { name, encrypted })
 
-  console.log(`New drive ${drive.id} created, for ${getKeyPair('pubkey')} key`)
+  console.log(`New drive ${drive.id} created, for ${Memory.getKeyPair('pubkey')} key`)
   console.log('Details', details)
 }
+
+module.exports = { createDriveCommand }

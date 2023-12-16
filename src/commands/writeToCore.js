@@ -1,8 +1,8 @@
-import inquirer from 'inquirer'
-import { getMasterDb } from '../utils/masterComponents.js'
-import { writeToCore } from '../utils/cores.js'
+const inquirer = require('inquirer')
+const { getMasterDb } = require('../utils/masterComponents.js')
+const { writeToCore } = require('../utils/cores.js')
 
-export const writeToCoreCommand = async () => {
+const writeToCoreCommand = async () => {
   const masterDb = await getMasterDb()
   const resources = await masterDb.getResources({ resource: 'hypercore' })
 
@@ -31,3 +31,5 @@ export const writeToCoreCommand = async () => {
 
   console.log(`You successfully wrote "${textToWrite}" into "${selectedCore.name}" core!`)
 }
+
+module.exports = { writeToCoreCommand }

@@ -1,11 +1,11 @@
-import Hyperdrive from 'hyperdrive'
-import { getChildStoragePath, getCorestore } from './cores.js'
-import goodbye from 'graceful-goodbye'
-import { Memory, generateChildKeyPair, generateEncryptionKeyFromKeyPair, getNextDerivedPath } from 'p2p-auth'
-import { deleteDirectory, toKebabCase, toTitleCase } from './helpers.js'
+const Hyperdrive = require('hyperdrive')
+const { getChildStoragePath, getCorestore } = require('./cores.js')
+const goodbye = require('graceful-goodbye')
+const { Memory, generateChildKeyPair, generateEncryptionKeyFromKeyPair, getNextDerivedPath } = require('p2p-auth')
+const { deleteDirectory, toKebabCase, toTitleCase } = require('./helpers.js')
 
 const drives = new Map()
-export async function makePrivateDrive (storagePath, keyPair, opts = {}) {
+async function makePrivateDrive (storagePath, keyPair, opts = {}) {
   if (drives.has(storagePath)) {
     return drives.get(storagePath)
   }
@@ -22,7 +22,7 @@ export async function makePrivateDrive (storagePath, keyPair, opts = {}) {
   return drive
 }
 
-export async function makeDrive (storagePath, keyPair, opts = {}) {
+async function makeDrive (storagePath, keyPair, opts = {}) {
   if (drives.has(storagePath)) return drives.get(storagePath)
 
   const primaryKey = opts.primaryKey || generateEncryptionKeyFromKeyPair(keyPair)
@@ -37,7 +37,7 @@ export async function makeDrive (storagePath, keyPair, opts = {}) {
   return drive
 }
 
-export async function createDrive (db, opts = {}) {
+async function createDrive (db, opts = {}) {
   const { name, encrypted } = opts
   const pathList = await db.getPathList()
   const path = getNextDerivedPath(pathList)
@@ -71,7 +71,7 @@ export async function createDrive (db, opts = {}) {
   return { drive, details }
 }
 
-export async function deleteDrive ({ db, key, resourceKey }) {
+async function deleteDrive ({ db, key, resourceKey }) {
   const resource = key ? await db.findResourceByKey(key) : resourceKey ? await db.findResourceByResourceKey(resourceKey) : null
   if (!resource) return null
 
@@ -82,4 +82,11 @@ export async function deleteDrive ({ db, key, resourceKey }) {
     await db.putJson(`details:${resource.details.key}`, resource.details)
     await deleteDirectory(resource.details.storagePath)
   }
+}
+
+module.exports = {
+  makePrivateDrive,
+  makeDrive,
+  createDrive,
+  deleteDrive
 }

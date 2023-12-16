@@ -1,7 +1,7 @@
-import inquirer from 'inquirer'
-import { getMasterDb } from '../utils/masterComponents.js'
+const inquirer = require('inquirer')
+const { getMasterDb } = require('../utils/masterComponents.js')
 
-export const readCoreCommand = async () => {
+const readCoreCommand = async () => {
   const masterDb = await getMasterDb()
   const resources = await masterDb.getResources({ resource: 'hypercore' })
 
@@ -23,3 +23,5 @@ export const readCoreCommand = async () => {
     console.log('Data: ', data.toString())
   }
 }
+
+module.exports = { readCoreCommand }

@@ -1,8 +1,8 @@
-import inquirer from 'inquirer'
-import { getMasterDb } from '../utils/masterComponents.js'
-import { deleteDrive } from '../utils/drives.js'
+const inquirer = require('inquirer')
+const { getMasterDb } = require('../utils/masterComponents.js')
+const { deleteDrive } = require('../utils/drives.js')
 
-export const deleteDriveCommand = async () => {
+const deleteDriveCommand = async () => {
   const masterDb = getMasterDb()
   const resources = await masterDb.getResources({ resource: 'hyperdrive' })
 
@@ -29,3 +29,5 @@ export const deleteDriveCommand = async () => {
   await deleteDrive({ db: masterDb, key: selectedDrive.key })
   console.log('Deletion completed.')
 }
+
+module.exports = { deleteDriveCommand }

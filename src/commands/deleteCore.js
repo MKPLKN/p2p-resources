@@ -1,8 +1,8 @@
-import inquirer from 'inquirer'
-import { getMasterDb } from '../utils/masterComponents.js'
-import { deleteCore } from '../utils/cores.js'
+const inquirer = require('inquirer')
+const { getMasterDb } = require('../utils/masterComponents.js')
+const { deleteCore } = require('../utils/cores.js')
 
-export const deleteCoreCommand = async () => {
+const deleteCoreCommand = async () => {
   const masterDb = await getMasterDb()
   const resources = await masterDb.getResources({ resource: 'hypercore' })
 
@@ -29,3 +29,5 @@ export const deleteCoreCommand = async () => {
   await deleteCore({ db: masterDb, key: selectedCore.key })
   console.log('Deletion completed.')
 }
+
+module.exports = { deleteCoreCommand }

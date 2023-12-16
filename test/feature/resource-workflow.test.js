@@ -1,19 +1,23 @@
-import fs from 'fs/promises'
-import { test } from 'brittle'
-import { Memory, createUser } from 'p2p-auth'
-import { initMasterComponents, getMasterCore, getMasterDb } from '../../src/utils/masterComponents.js'
-import { clearCore, createCore, deleteCore, writeToCore } from '../../src/utils/cores.js'
-import { getConfig, setConfig } from '../../src/utils/config.js'
-import { createDrive, deleteDrive } from '../../src/utils/drives.js'
+const fs = require('fs/promises')
+const { test } = require('brittle')
+const { Memory, createUser } = require('p2p-auth')
+const { initMasterComponents, getMasterCore, getMasterDb } = require('../../src/utils/masterComponents.js')
+const { clearCore, createCore, deleteCore, writeToCore } = require('../../src/utils/cores.js')
+const { getConfig, setConfig } = require('../../src/utils/config.js')
+const { createDrive, deleteDrive } = require('../../src/utils/drives.js')
 
 setConfig('resourcesLocation', './test/.p2p-resources')
 
-const username = 'username'
-const password = 'password'
-// This also stores the user's info into the Memory
-await createUser({ username, password })
+async function createUsers () {
+  const username = 'username'
+  const password = 'password'
+  // This also stores the user's info into the Memory
+  await createUser({ username, password })
+}
 
 test('Workflow to manage resources', async (t) => {
+  await createUsers()
+
   // Testing the memory
   t.ok(Memory.getKeyPair(), 'Key pair should be set after auth')
   t.ok(Memory.getKeyPair('pubkey'), 'Public key should be set after auth')

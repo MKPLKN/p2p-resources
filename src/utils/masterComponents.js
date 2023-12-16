@@ -1,11 +1,11 @@
-import { Memory } from 'p2p-auth'
-import { getMasterStoragePath, makePrivateCore } from './cores.js'
-import { makeDatabase } from './databases.js'
+const { Memory } = require('p2p-auth')
+const { getMasterStoragePath, makePrivateCore } = require('./cores.js')
+const { makeDatabase } = require('./databases.js')
 
 let masterCoreInstance = null
 let masterDbInstance = null
 
-export const initMasterComponents = async (opts = {}) => {
+const initMasterComponents = async (opts = {}) => {
   const { coreOpts, dbOpts } = opts
   const keyPair = Memory.getKeyPair()
 
@@ -17,25 +17,33 @@ export const initMasterComponents = async (opts = {}) => {
   return { masterCore, masterDb }
 }
 
-export const setMasterComponents = ({ masterCore, masterDb }) => {
+const setMasterComponents = ({ masterCore, masterDb }) => {
   masterCoreInstance = masterCore
   masterDbInstance = masterDb
 }
 
-export const getMasterComponents = () => {
+const getMasterComponents = () => {
   return { masterCore: masterCoreInstance, masterDb: masterDbInstance }
 }
 
-export const getMasterCore = () => {
+const getMasterCore = () => {
   if (!masterCoreInstance) {
     throw new Error('masterCore is not initialized')
   }
   return masterCoreInstance
 }
 
-export const getMasterDb = () => {
+const getMasterDb = () => {
   if (!masterDbInstance) {
     throw new Error('masterDb is not initialized')
   }
   return masterDbInstance
+}
+
+module.exports = {
+  initMasterComponents,
+  setMasterComponents,
+  getMasterComponents,
+  getMasterCore,
+  getMasterDb
 }

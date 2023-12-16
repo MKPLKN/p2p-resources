@@ -1,34 +1,34 @@
-import Corestore from 'corestore'
-import { Memory, generateEncryptionKeyFromKeyPair, generateChildKeyPair, getNextDerivedPath } from 'p2p-auth'
-import { toKebabCase, toTitleCase } from './helpers.js'
-import { getConfig } from './config.js'
-import goodbye from 'graceful-goodbye'
+const Corestore = require('corestore')
+const { Memory, generateEncryptionKeyFromKeyPair, generateChildKeyPair, getNextDerivedPath } = require('p2p-auth')
+const { toKebabCase, toTitleCase } = require('./helpers.js')
+const { getConfig } = require('./config.js')
+const goodbye = require('graceful-goodbye')
 
-export function getDefaultStoragePath () {
+function getDefaultStoragePath () {
   const prefix = getConfig('resourcesLocation', './.p2p-resources')
   return `${prefix}/${Memory.getUsername()}`
 }
 
-export function getReaderStoragePath (path) {
+function getReaderStoragePath (path) {
   const defaultPath = getDefaultStoragePath()
   const storage = `${defaultPath}/reader`
   return path ? `${storage}/${path}` : storage
 }
 
-export function getChildStoragePath (path) {
+function getChildStoragePath (path) {
   const defaultPath = getDefaultStoragePath()
   const storage = `${defaultPath}/child`
   return path ? `${storage}/${path}` : storage
 }
 
-export function getMasterStoragePath (path) {
+function getMasterStoragePath (path) {
   const defaultPath = getDefaultStoragePath()
   const storage = `${defaultPath}/master`
   return path ? `${storage}/${path}` : storage
 }
 
 const store = {}
-export async function getCorestore (path = null, opts = {}) {
+async function getCorestore (path = null, opts = {}) {
   if (path && store[path]) return store[path]
 
   const storage = path || getDefaultStoragePath()
@@ -38,7 +38,7 @@ export async function getCorestore (path = null, opts = {}) {
   return store[storage]
 }
 
-export async function makeCore (path, keyPair, opts = {}) {
+async function makeCore (path, keyPair, opts = {}) {
   if (typeof path !== 'string') {
     keyPair = path
     opts = keyPair
@@ -56,7 +56,7 @@ export async function makeCore (path, keyPair, opts = {}) {
   return core
 }
 
-export async function makePrivateCore (path, keyPair, opts = {}) {
+async function makePrivateCore (path, keyPair, opts = {}) {
   if (typeof path !== 'string') {
     keyPair = path
     opts = keyPair
@@ -77,7 +77,7 @@ export async function makePrivateCore (path, keyPair, opts = {}) {
   return core
 }
 
-export const getKeys = (core) => {
+const getKeys = (core) => {
   const { id, key, discoveryKey } = core
 
   return {
@@ -87,7 +87,7 @@ export const getKeys = (core) => {
   }
 }
 
-export async function createCore (db, opts = {}) {
+async function createCore (db, opts = {}) {
   const { name, encrypted } = opts
   const pathList = await db.getPathList()
   const path = getNextDerivedPath(pathList)
@@ -110,7 +110,7 @@ export async function createCore (db, opts = {}) {
   const storagePath = getChildStoragePath(suffix)
   details.storagePath = storagePath
   const core = encrypted ? await makePrivateCore(storagePath, keyPair) : await makeCore(storagePath, keyPair)
-  details.resourceKey = core.key
+  details.resourceKey = core.key.toString('hex')
 
   await db.push('derived-paths', path)
   await db.push('keys', details.key)
@@ -119,7 +119,7 @@ export async function createCore (db, opts = {}) {
   return { core, details }
 }
 
-export async function writeToCore ({ db, key, data }) {
+async function writeToCore ({ db, key, data }) {
   const resource = await db.findResourceByKey(key)
   const core = resource.hypercore
   if (core) {
@@ -129,7 +129,7 @@ export async function writeToCore ({ db, key, data }) {
   return false
 }
 
-export async function clearCore ({ db, key }) {
+async function clearCore ({ db, key }) {
   const resource = await db.findResourceByKey(key)
   const core = resource.hypercore
   if (core) {
@@ -137,7 +137,7 @@ export async function clearCore ({ db, key }) {
   }
 }
 
-export async function deleteCore ({ db, key, resourceKey }) {
+async function deleteCore ({ db, key, resourceKey }) {
   const resource = key ? await db.findResourceByKey(key) : resourceKey ? await db.findResourceByResourceKey(resourceKey) : null
   if (!resource) return null
   const core = resource.hypercore
@@ -147,4 +147,19 @@ export async function deleteCore ({ db, key, resourceKey }) {
     resource.details.deleted_at = new Date().getTime()
     await db.putJson(`details:${resource.details.key}`, resource.details)
   }
+}
+
+module.exports = {
+  getDefaultStoragePath,
+  getReaderStoragePath,
+  getChildStoragePath,
+  getMasterStoragePath,
+  getCorestore,
+  getKeys,
+  makeCore,
+  makePrivateCore,
+  createCore,
+  writeToCore,
+  clearCore,
+  deleteCore
 }

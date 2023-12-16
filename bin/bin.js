@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-import { program } from 'commander'
-import authenticate from '../src/auth/index.js'
-import listCommand from '../src/commands/list.js'
-import { createCoreCommand } from '../src/commands/createCore.js'
-import { deleteCoreCommand } from '../src/commands/deleteCore.js'
-import { writeToCoreCommand } from '../src/commands/writeToCore.js'
-import { readCoreCommand } from '../src/commands/readCore.js'
-import { clearCoreCommand } from '../src/commands/clearCore.js'
-import { createDriveCommand } from '../src/commands/createDrive.js'
-import { deleteDriveCommand } from '../src/commands/deleteDrive.js'
-import { initMasterComponents } from '../src/index.js'
+const { program } = require('commander')
+const authenticate = require('../src/auth/index.js')
+const { listCommand } = require('../src/commands/list.js')
+const { createCoreCommand } = require('../src/commands/createCore.js')
+const { deleteCoreCommand } = require('../src/commands/deleteCore.js')
+const { writeToCoreCommand } = require('../src/commands/writeToCore.js')
+const { readCoreCommand } = require('../src/commands/readCore.js')
+const { clearCoreCommand } = require('../src/commands/clearCore.js')
+const { createDriveCommand } = require('../src/commands/createDrive.js')
+const { deleteDriveCommand } = require('../src/commands/deleteDrive.js')
+const { initMasterComponents } = require('../src/index.js')
 
 const startCLI = async () => {
   await authenticate()

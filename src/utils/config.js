@@ -1,13 +1,17 @@
-import fs from 'fs'
-import path from 'path'
+const os = require('os')
+const fs = require('fs')
+const path = require('path')
 
 let cachedConfig = null
 
+// Get the user's home directory
+const homeDir = os.homedir()
+
 let defaultConfig = {
-  resourcesLocation: './.p2p-resources'
+  resourcesLocation: path.join(homeDir, '.p2p-resources')
 }
 
-export function setConfig (key, value) {
+function setConfig (key, value) {
   if (typeof key === 'object') {
     defaultConfig = { ...defaultConfig, ...key }
   } else {
@@ -17,7 +21,7 @@ export function setConfig (key, value) {
   return defaultConfig
 }
 
-export const loadConfigs = () => {
+const loadConfigs = () => {
   // Read JSON config file
   const configPath = path.join(process.cwd(), 'shareit-config.json')
   let configData = defaultConfig
@@ -38,7 +42,7 @@ export const loadConfigs = () => {
 }
 
 // Getter function
-export const getConfig = (key = null, defaultValue = null) => {
+const getConfig = (key = null, defaultValue = null) => {
   if (cachedConfig === null) {
     loadConfigs()
   }
@@ -48,4 +52,10 @@ export const getConfig = (key = null, defaultValue = null) => {
   }
 
   return Object.prototype.hasOwnProperty.call(cachedConfig, key) ? cachedConfig[key] : defaultValue
+}
+
+module.exports = {
+  setConfig,
+  loadConfigs,
+  getConfig
 }

@@ -1,14 +1,14 @@
-import fs from 'fs/promises'
+const fs = require('fs/promises')
 
-export const toTitleCase = (str) => {
+const toTitleCase = (str) => {
   return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 }
 
-export const toKebabCase = (str) => {
+const toKebabCase = (str) => {
   return str.toLowerCase().replace(/\s+/g, '-')
 }
 
-export async function deleteDirectory (path, opts = {}) {
+async function deleteDirectory (path, opts = {}) {
   if (path) {
     try {
       await fs.rm(path, { recursive: true, force: true, ...opts })
@@ -22,4 +22,10 @@ export async function deleteDirectory (path, opts = {}) {
     console.log('storagePath is not provided or invalid')
     return false
   }
+}
+
+module.exports = {
+  toTitleCase,
+  toKebabCase,
+  deleteDirectory
 }

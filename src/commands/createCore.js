@@ -1,10 +1,10 @@
-import inquirer from 'inquirer'
-import { createCore } from '../utils/cores.js'
-import { getKeyPair } from '../utils/keyPair.js'
-import { getMasterDb } from '../utils/masterComponents.js'
-import { toKebabCase, toTitleCase } from '../utils/helpers.js'
+const inquirer = require('inquirer')
+const { createCore } = require('../utils/cores.js')
+const { getMasterDb } = require('../utils/masterComponents.js')
+const { toKebabCase, toTitleCase } = require('../utils/helpers.js')
+const { Memory } = require('p2p-auth')
 
-export const createCoreCommand = async () => {
+const createCoreCommand = async () => {
   const masterDb = getMasterDb()
 
   const { name, encrypted } = await inquirer.prompt([
@@ -41,6 +41,8 @@ export const createCoreCommand = async () => {
   const { details, core } = await createCore(masterDb, { name, encrypted })
 
   // const core = await makeCore(keyPair)
-  console.log(`New core ${core.id} created, for ${getKeyPair('pubkey')} key`)
+  console.log(`New core ${core.id} created, for ${Memory.getKeyPair('pubkey')} key`)
   console.log('Details', details)
 }
+
+module.exports = { createCoreCommand }

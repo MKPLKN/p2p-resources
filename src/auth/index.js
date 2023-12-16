@@ -1,4 +1,4 @@
-import { Memory, authCLI } from 'p2p-auth'
+const { authCLI } = require('p2p-auth')
 
 /**
  * Authenticate the user.
@@ -7,7 +7,7 @@ import { Memory, authCLI } from 'p2p-auth'
  * @param {*} authFn
  * @returns
  */
-const authenticate = async (authFn = null) => {
+module.exports = async (authFn = null) => {
   try {
     const auth = authFn || authCLI
     const { keyPair, seed } = await auth()
@@ -18,5 +18,3 @@ const authenticate = async (authFn = null) => {
     process.exit(1)
   }
 }
-
-export default authenticate
