@@ -25,7 +25,7 @@
     "hypercore": "^10.30.0",
     "hyperdrive": "^11.6.2",
     "inquirer": "^8.2.6",
-    "p2p-auth": "github:MKPLKN/p2p-auth#esm-to-cjs"
+    "p2p-auth": "^0.06"
   },
   "devDependencies": {
     "brittle": "^3.3.2",
