@@ -6,7 +6,7 @@ const goodbye = require('graceful-goodbye')
 
 function getDefaultStoragePath () {
   const prefix = getConfig('resourcesLocation', './.p2p-resources')
-  return `${prefix}/${Memory.getUsername()}`
+  return `${prefix}/${Memory.getKeyPair('pubkey')}`
 }
 
 function getReaderStoragePath (path) {
