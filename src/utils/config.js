@@ -23,7 +23,7 @@ function setConfig (key, value) {
 
 const loadConfigs = () => {
   // Read JSON config file
-  const configPath = path.join(process.cwd(), 'shareit-config.json')
+  const configPath = path.join(process.cwd(), 'p2p-resources-config.json')
   let configData = defaultConfig
 
   if (fs.existsSync(configPath)) {
