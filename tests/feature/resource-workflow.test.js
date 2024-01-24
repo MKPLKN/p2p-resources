@@ -5,6 +5,8 @@ const { initMasterComponents, getMasterCore, getMasterDb } = require('../../src/
 const { clearCore, createCore, deleteCore, writeToCore } = require('../../src/utils/cores.js')
 const { getConfig, setConfig } = require('../../src/utils/config.js')
 const { createDrive, deleteDrive } = require('../../src/utils/drives.js')
+const { createNode, createSwarm, makeSwarm, deleteResource } = require('../../src/utils/nodes.js')
+const HyperDHT = require('hyperdht')
 
 setConfig('resourcesLocation', './test/.p2p-resources')
 
@@ -123,6 +125,84 @@ test('Workflow to manage resources', async (t) => {
   details = await masterDb.getDetails()
   t.is(resources.length, 1, 'After drive is deleted, resources list should have one item')
   t.is(details.length, 3, 'After drive is deleted, details list should have three item')
+
+  // Create DHT node
+  const { node } = await createNode(masterDb, { name: 'test-dht-node', bootstrap: [] })
+  resource = await masterDb.findResourceByName('test-dht-node', { skipCache: true, resource: 'hyperdht' })
+  t.alike(node.key, resource.details.key)
+  const testNode = new HyperDHT(resource.opts)
+  t.alike(testNode.defaultKeyPair.publicKey.toString('hex'), resource.details.key)
+  await testNode.destroy()
+
+  // List resources
+  resources = await masterDb.getResources({ skipCache: true })
+  details = await masterDb.getDetails()
+  t.is(resources.length, 2, 'After DHT is created, resources list should have two item')
+  t.is(details.length, 4, 'After DHT is created, details list should have four item')
+
+  // Create Swarm
+  const { swarm } = await createSwarm(masterDb, {
+    name: 'test-swarm',
+    dht: {
+      name: 'test-dht-node' // If resource is not found by given name, it should create it
+    }
+  })
+  const swarmResource = await masterDb.findResourceByName('test-swarm', { skipCache: true, resource: 'hyperswarm' })
+  t.alike(node.key, swarmResource.opts.dht.keyPair.publicKey.toString('hex'))
+  t.alike(swarm.key, swarmResource.opts.keyPair.publicKey.toString('hex'))
+  const testSwarm = makeSwarm(swarmResource.opts)
+  t.alike(testNode.defaultKeyPair.publicKey.toString('hex'), testSwarm.dht.defaultKeyPair.publicKey.toString('hex'))
+  await testSwarm.destroy()
+
+  // List resources
+  resources = await masterDb.getResources({ skipCache: true })
+  details = await masterDb.getDetails()
+  t.is(resources.length, 3, 'After Swarm is created, resources list should have three item')
+  t.is(details.length, 5, 'After Swarm is created, details list should have five item')
+
+  // Create Swarm without DHT name
+  const { swarm: swarm2 } = await createSwarm(masterDb, {
+    name: 'test-swarm-2'
+  })
+  const swarmResource2 = await masterDb.findResourceByName('test-swarm-2', { skipCache: true, resource: 'hyperswarm' })
+  t.absent(swarmResource2.opts.dht)
+  t.alike(swarm2.key, swarmResource2.opts.keyPair.publicKey.toString('hex'))
+  const testSwarm2 = makeSwarm(swarmResource2.opts)
+  t.unlike(testNode.defaultKeyPair.publicKey.toString('hex'), testSwarm2.dht.defaultKeyPair.publicKey.toString('hex'))
+  await testSwarm2.destroy()
+
+  // List resources
+  resources = await masterDb.getResources({ skipCache: true })
+  details = await masterDb.getDetails()
+  t.is(resources.length, 4, 'After Swarm is created, resources list should have four item')
+  t.is(details.length, 6, 'After Swarm is created, details list should have six item')
+
+  // Delete node
+  await deleteResource({ db: masterDb, resourceKey: node.resourceKey })
+
+  // List resources
+  resources = await masterDb.getResources({ skipCache: true })
+  details = await masterDb.getDetails()
+  t.is(resources.length, 3, 'After Node is deleted, resources list should have three item')
+  t.is(details.length, 6, 'After Node is deleted, details list should have six item')
+
+  // Delete swarm
+  await deleteResource({ db: masterDb, resourceKey: swarm2.resourceKey })
+
+  // List resources
+  resources = await masterDb.getResources({ skipCache: true })
+  details = await masterDb.getDetails()
+  t.is(resources.length, 2, 'After Swarm is deleted, resources list should have three item')
+  t.is(details.length, 6, 'After Swarm is deleted, details list should have six item')
+
+  // Delete swarm
+  await deleteResource({ db: masterDb, resourceKey: swarm.resourceKey })
+
+  // List resources
+  resources = await masterDb.getResources({ skipCache: true })
+  details = await masterDb.getDetails()
+  t.is(resources.length, 1, 'After Swarm is deleted, resources list should have three item')
+  t.is(details.length, 6, 'After Swarm is deleted, details list should have six item')
 
   // Tests clean up
   await fs.rm(getConfig('resourcesLocation'), { recursive: true })

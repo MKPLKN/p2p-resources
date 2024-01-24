@@ -9,6 +9,8 @@ const { readCoreCommand } = require('../src/commands/readCore.js')
 const { clearCoreCommand } = require('../src/commands/clearCore.js')
 const { createDriveCommand } = require('../src/commands/createDrive.js')
 const { deleteDriveCommand } = require('../src/commands/deleteDrive.js')
+const { createDhtNodeCommand } = require('../src/commands/createDhtNode.js')
+const { deleteDhtNodeCommand } = require('../src/commands/deleteDhtNode.js')
 const { initMasterComponents } = require('../src/index.js')
 
 const startCLI = async () => {
@@ -60,6 +62,24 @@ const startCLI = async () => {
     .alias('del:drive')
     .description('Delete an existing drive')
     .action(deleteDriveCommand)
+
+  program
+    .command('create:node')
+    .alias('add:node')
+    .alias('make:node')
+    .alias('create:dht')
+    .alias('add:dht')
+    .alias('make:dht')
+    .description('Create a new DHT node')
+    .action(createDhtNodeCommand)
+
+  program
+    .command('delete:node')
+    .alias('del:node')
+    .alias('delete:dht')
+    .alias('del:dht')
+    .description('Delete an existing DHT node')
+    .action(deleteDhtNodeCommand)
 
   program.parse(process.argv)
 }
