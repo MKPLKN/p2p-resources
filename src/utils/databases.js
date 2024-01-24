@@ -97,6 +97,7 @@ class HandyBee extends Hyperbee {
     }
 
     this.resources = []
+    const hyperswarms = []
     for (const path of (await this.getJsonValue('derived-paths', []))) {
       const keyPair = generateChildKeyPair(Memory.getSeed(), path)
       const pubkey = keyPair.publicKey.toString('hex')
@@ -112,7 +113,34 @@ class HandyBee extends Hyperbee {
           const drive = details.encrypted ? await makePrivateDrive(storagePath, keyPair) : await makeDrive(storagePath, keyPair)
           this.resources.push({ details, hyperdrive: drive })
         }
+
+        if (details.resource === 'hyperdht') {
+          // When you're ready to use the HyperDHT instance, you can initialise it like this:
+          // -> makeNode(resource.opts)
+          this.resources.push({ details, opts: { ...details.opts, keyPair } })
+        }
+
+        if (details.resource === 'hyperswarm') {
+          // When you're ready to use the Hyperswarm instance, you can initialise it like this:
+          // -> makeSwarm(resource.opts)
+          hyperswarms.push({ keyPair, details })
+        }
       }
+    }
+
+    for await (const swarm of hyperswarms) {
+      const { details, keyPair } = swarm
+
+      // If DHT name is not given, it will always create a new DHT instance for the Hyperswarm
+      const name = details?.opts?.dht?.name
+      let dht = null
+      if (name) {
+        const dhtResource = this.resources.find(r => String(r.details.name).toLowerCase() === String(name).toLowerCase())
+        if (dhtResource && dhtResource.opts) {
+          dht = dhtResource.opts
+        }
+      }
+      this.resources.push({ details, opts: { ...details.opts, dht, keyPair } })
     }
 
     return filters.length ? this.resources.filter(r => filters.every(f => f(r))) : this.resources
