@@ -116,14 +116,17 @@ class HandyBee extends Hyperbee {
 
         if (details.resource === 'hyperdht') {
           // When you're ready to use the HyperDHT instance, you can initialise it like this:
-          // -> makeNode(resource.opts)
-          this.resources.push({ details, opts: { ...details.opts, keyPair } })
+          // -> makeNode(resource.details.opts)
+          details.opts = { ...details.opts, keyPair }
+          this.resources.push({ details })
         }
 
         if (details.resource === 'hyperswarm') {
           // When you're ready to use the Hyperswarm instance, you can initialise it like this:
-          // -> makeSwarm(resource.opts)
-          hyperswarms.push({ keyPair, details })
+          // -> makeSwarm(resource.details.opts)
+          details.opts = { ...details.opts, keyPair }
+          this.resources.push({ details })
+          // hyperswarms.push({ keyPair, details })
         }
       }
     }

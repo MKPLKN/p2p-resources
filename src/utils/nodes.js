@@ -9,9 +9,6 @@ function makeNode (opts) {
 }
 
 function makeSwarm (opts) {
-  if (opts && opts.dht) {
-    opts.dht = makeNode(opts.dht)
-  }
   return new Hyperswarm(opts)
 }
 
@@ -52,17 +49,7 @@ async function createSwarm (db, opts = {}) {
   const path = getNextDerivedPath(pathList)
   const keyPair = generateChildKeyPair(Memory.getSeed(), path)
 
-  let dhtNode = null
-  if (opts.dht && opts.dht.name) {
-    dhtNode = await db.findResourceByName(opts.dht.name)
-    if (!dhtNode) {
-      const { node: createdNode } = await createNode(db, { ...opts.dht })
-      dhtNode = createdNode
-    } else {
-      dhtNode = dhtNode.hyperdht
-    }
-  }
-
+  delete opts.name
   const details = {
     type: 'keypair',
     title: toTitleCase(name),
