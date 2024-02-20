@@ -28,7 +28,7 @@
     "hyperdrive": "^11.6.2",
     "hyperswarm": "^4.7.13",
     "inquirer": "^8.2.6",
-    "p2p-auth": "^0.0.10"
+    "p2p-auth": "^1.0.1"
   },
   "devDependencies": {
     "brittle": "^3.3.2",
