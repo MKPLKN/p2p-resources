@@ -68,15 +68,15 @@ class HandyBee extends Hyperbee {
     return updatedValues
   }
 
-  async getDetails (resource = null) {
+  async getDetails (opts = {}) {
+    const { resource, name } = opts
     const list = []
-    for (const path of (await this.getJsonValue('derived-paths', []))) {
-      const keyPair = generateChildKeyPair(Memory.getSeed(), path)
-      const pubkey = keyPair.publicKey.toString('hex')
-      const details = (await this.getJsonValue(`details:${pubkey}`))
-      if (details && (!resource || details.resource === resource)) {
-        list.push(details)
-      }
+    for (const key of (await this.getJsonValue('keys', []))) {
+      const details = (await this.getJsonValue(`details:${key}`))
+      if (!details) continue
+      if (name && String(details.name).toLowerCase() !== String(name).toLowerCase()) continue
+      if (resource && details.resource !== resource) continue
+      list.push(details)
     }
     return list
   }
@@ -98,10 +98,9 @@ class HandyBee extends Hyperbee {
 
     this.resources = []
     const hyperswarms = []
-    for (const path of (await this.getJsonValue('derived-paths', []))) {
-      const keyPair = generateChildKeyPair(Memory.getSeed(), path)
-      const pubkey = keyPair.publicKey.toString('hex')
-      const details = (await this.getJsonValue(`details:${pubkey}`))
+    for (const key of (await this.getJsonValue('keys', []))) {
+      const details = (await this.getJsonValue(`details:${key}`))
+      const keyPair = generateChildKeyPair(Memory.getSeed(), details.name)
       if (details && !details.deleted_at) {
         const storagePath = details.storagePath
         if (details.resource === 'hypercore') {

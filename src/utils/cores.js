@@ -1,5 +1,5 @@
 const Corestore = require('corestore')
-const { Memory, generateEncryptionKeyFromKeyPair, generateChildKeyPair, getNextDerivedPath } = require('p2p-auth')
+const { Memory, generateEncryptionKeyFromKeyPair, generateChildKeyPair } = require('p2p-auth')
 const { toKebabCase, toTitleCase } = require('./helpers.js')
 const { getConfig } = require('./config.js')
 const goodbye = require('graceful-goodbye')
@@ -89,18 +89,19 @@ const getKeys = (core) => {
 
 async function createCore (db, opts = {}) {
   const { name, encrypted } = opts
-  const pathList = await db.getPathList()
-  const path = getNextDerivedPath(pathList)
-  const keyPair = generateChildKeyPair(Memory.getSeed(), path)
+  const kebabName = toKebabCase(name)
+
+  if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
+
+  const keyPair = generateChildKeyPair(Memory.getSeed(), kebabName)
 
   const details = {
     type: 'keypair',
     title: toTitleCase(name),
-    name: toKebabCase(name),
+    name: kebabName,
     encrypted,
     resource: 'hypercore',
     key: keyPair.publicKey.toString('hex'),
-    path,
     deleted_at: null,
     updated_at: new Date().getTime(),
     created_at: new Date().getTime()
@@ -112,7 +113,7 @@ async function createCore (db, opts = {}) {
   const core = encrypted ? await makePrivateCore(storagePath, keyPair) : await makeCore(storagePath, keyPair)
   details.resourceKey = core.key.toString('hex')
 
-  await db.push('derived-paths', path)
+  // await db.push('derived-paths', path)
   await db.push('keys', details.key)
   await db.putJson(`details:${details.key}`, details)
 

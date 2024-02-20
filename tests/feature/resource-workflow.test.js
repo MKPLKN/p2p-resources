@@ -8,6 +8,9 @@ const { createDrive, deleteDrive } = require('../../src/utils/drives.js')
 const { createNode, createSwarm, makeSwarm, deleteResource } = require('../../src/utils/nodes.js')
 const HyperDHT = require('hyperdht')
 
+process.env.OPSLIMIT = 1
+process.env.MEMLIMIT = 8192
+
 setConfig('resourcesLocation', './test/.p2p-resources')
 
 async function createUsers () {
@@ -103,8 +106,8 @@ test('Workflow to manage resources', async (t) => {
   t.is(details.length, 2, 'After another core is created, details list should have two item')
 
   // Create drive
-  const testDriveA = await createDrive(masterDb, { name: 'test-a', encrypted: true })
-  t.is(testDriveA.details.name, 'test-a', 'Creatd drive name should match')
+  const testDriveA = await createDrive(masterDb, { name: 'test-a-drive', encrypted: true })
+  t.is(testDriveA.details.name, 'test-a-drive', 'Creatd drive name should match')
   t.is(testDriveA.details.encrypted, true, 'Created drive should be encrypted')
   t.alike(testDriveA.details.encrypted, !!testDriveA.drive.encryptionKey, 'Confirm the actual Hyperdrive is encrypted')
   t.alike(testDriveA.details.resourceKey, testDriveA.drive.key.toString('hex'), 'Created drives key should match')

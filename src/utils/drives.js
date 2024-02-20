@@ -1,7 +1,7 @@
 const Hyperdrive = require('hyperdrive')
 const { getChildStoragePath, getCorestore } = require('./cores.js')
 const goodbye = require('graceful-goodbye')
-const { Memory, generateChildKeyPair, generateEncryptionKeyFromKeyPair, getNextDerivedPath } = require('p2p-auth')
+const { Memory, generateChildKeyPair, generateEncryptionKeyFromKeyPair } = require('p2p-auth')
 const { deleteDirectory, toKebabCase, toTitleCase } = require('./helpers.js')
 
 const drives = new Map()
@@ -39,19 +39,19 @@ async function makeDrive (storagePath, keyPair, opts = {}) {
 
 async function createDrive (db, opts = {}) {
   const { name, encrypted } = opts
-  const pathList = await db.getPathList()
-  const path = getNextDerivedPath(pathList)
-  const keyPair = generateChildKeyPair(Memory.getSeed(), path)
+  const kebabName = toKebabCase(name)
 
+  if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
+
+  const keyPair = generateChildKeyPair(Memory.getSeed(), kebabName)
   const time = new Date().getTime()
   const details = {
     type: 'keypair',
     title: toTitleCase(name),
-    name: toKebabCase(name),
+    name: kebabName,
     key: keyPair.publicKey.toString('hex'),
     encrypted,
     resource: 'hyperdrive',
-    path,
     deleted_at: null,
     updated_at: time,
     created_at: time
@@ -64,7 +64,6 @@ async function createDrive (db, opts = {}) {
   const drive = encrypted ? await makePrivateDrive(storagePath, keyPair) : await makeDrive(storagePath, keyPair)
   details.resourceKey = drive.key.toString('hex')
 
-  await db.push('derived-paths', path)
   await db.push('keys', details.key)
   await db.putJson(`details:${details.key}`, details)
 

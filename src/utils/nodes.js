@@ -1,4 +1,4 @@
-const { getNextDerivedPath, generateChildKeyPair, Memory } = require('p2p-auth')
+const { generateChildKeyPair, Memory } = require('p2p-auth')
 const { toTitleCase, toKebabCase } = require('./helpers')
 const { getChildStoragePath } = require('./cores')
 const HyperDHT = require('hyperdht')
@@ -14,17 +14,16 @@ function makeSwarm (opts) {
 
 async function createNode (db, opts = {}) {
   const { name } = opts
-  const pathList = await db.getPathList()
-  const path = getNextDerivedPath(pathList)
-  const keyPair = generateChildKeyPair(Memory.getSeed(), path)
+  const kebabName = toKebabCase(name)
+  if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
+  const keyPair = generateChildKeyPair(Memory.getSeed(), kebabName)
 
   const details = {
     type: 'keypair',
     title: toTitleCase(name),
-    name: toKebabCase(name),
+    name: kebabName,
     resource: 'hyperdht',
     key: keyPair.publicKey.toString('hex'),
-    path,
     opts: { bootstrap: opts.bootstrap || null },
     deleted_at: null,
     updated_at: new Date().getTime(),
@@ -36,7 +35,6 @@ async function createNode (db, opts = {}) {
   details.storagePath = storagePath
   details.resourceKey = keyPair.publicKey.toString('hex')
 
-  await db.push('derived-paths', path)
   await db.push('keys', details.key)
   await db.putJson(`details:${details.key}`, details)
 
@@ -45,18 +43,17 @@ async function createNode (db, opts = {}) {
 
 async function createSwarm (db, opts = {}) {
   const { name } = opts
-  const pathList = await db.getPathList()
-  const path = getNextDerivedPath(pathList)
-  const keyPair = generateChildKeyPair(Memory.getSeed(), path)
+  const kebabName = toKebabCase(name)
+  if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
+  const keyPair = generateChildKeyPair(Memory.getSeed(), kebabName)
 
   delete opts.name
   const details = {
     type: 'keypair',
     title: toTitleCase(name),
-    name: toKebabCase(name),
+    name: kebabName,
     resource: 'hyperswarm',
     key: keyPair.publicKey.toString('hex'),
-    path,
     opts,
     deleted_at: null,
     updated_at: new Date().getTime(),
@@ -68,7 +65,6 @@ async function createSwarm (db, opts = {}) {
   details.storagePath = storagePath
   details.resourceKey = keyPair.publicKey.toString('hex')
 
-  await db.push('derived-paths', path)
   await db.push('keys', details.key)
   await db.putJson(`details:${details.key}`, details)
 
