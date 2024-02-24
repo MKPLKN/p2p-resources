@@ -4,9 +4,10 @@ const { toKebabCase, toTitleCase } = require('./helpers.js')
 const { getConfig } = require('./config.js')
 const goodbye = require('graceful-goodbye')
 
-function getDefaultStoragePath () {
+function getDefaultStoragePath (pubkey) {
+  const key = pubkey ? (typeof pubkey === 'string' ? pubkey : pubkey.toString('hex')) : Memory.getKeyPair('pubkey')
   const prefix = getConfig('resourcesLocation', './.p2p-resources')
-  return `${prefix}/${Memory.getKeyPair('pubkey')}`
+  return `${prefix}/${key}`
 }
 
 function getReaderStoragePath (path) {
