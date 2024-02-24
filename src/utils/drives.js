@@ -43,7 +43,7 @@ async function createDrive (db, opts = {}) {
 
   if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
 
-  const keyPair = generateChildKeyPair(Memory.getSeed(), kebabName)
+  const keyPair = opts.getKeyPair ? opts.getKeyPair(kebabName) : generateChildKeyPair(Memory.getSeed(), kebabName)
   const time = new Date().getTime()
   const details = {
     type: 'keypair',
