@@ -1,5 +1,5 @@
 const Hyperbee = require('hyperbee')
-const { generateChildKeyPair, Memory } = require('p2p-auth')
+const { Memory, generateKeyPairFromSeed, generateChildKeyPair } = require('p2p-auth')
 const { getKeys, makeCore, makePrivateCore } = require('./cores.js')
 const goodbye = require('graceful-goodbye')
 const { makeDrive, makePrivateDrive } = require('./drives.js')
@@ -100,7 +100,9 @@ class HandyBee extends Hyperbee {
     const hyperswarms = []
     for (const key of (await this.getJsonValue('keys', []))) {
       const details = (await this.getJsonValue(`details:${key}`))
-      const keyPair = generateChildKeyPair(Memory.getSeed(), details.name)
+      const keyPair = details.seed
+        ? generateKeyPairFromSeed(details.seed, details.name)
+        : generateChildKeyPair(Memory.getSeed(), details.name)
       if (details && !details.deleted_at) {
         const storagePath = details.storagePath
         if (details.resource === 'hypercore') {

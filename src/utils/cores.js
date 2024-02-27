@@ -94,13 +94,16 @@ async function createCore (db, opts = {}) {
 
   if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
 
-  const keyPair = opts.getKeyPair ? opts.getKeyPair(kebabName) : generateChildKeyPair(Memory.getSeed(), kebabName)
+  const { seed, keyPair } = opts.getKeyPair
+    ? opts.getKeyPair(kebabName)
+    : { seed: null, keyPair: generateChildKeyPair(Memory.getSeed(), kebabName) }
 
   const details = {
     type: 'keypair',
     title: toTitleCase(name),
     name: kebabName,
     encrypted,
+    seed,
     resource: 'hypercore',
     key: keyPair.publicKey.toString('hex'),
     deleted_at: null,

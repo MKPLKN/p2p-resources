@@ -16,13 +16,17 @@ async function createNode (db, opts = {}) {
   const { name } = opts
   const kebabName = toKebabCase(name)
   if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
-  const keyPair = opts.getKeyPair ? opts.getKeyPair(kebabName) : generateChildKeyPair(Memory.getSeed(), kebabName)
+
+  const { seed, keyPair } = opts.getKeyPair
+    ? opts.getKeyPair(kebabName)
+    : { seed: null, keyPair: generateChildKeyPair(Memory.getSeed(), kebabName) }
 
   const details = {
     type: 'keypair',
     title: toTitleCase(name),
     name: kebabName,
     resource: 'hyperdht',
+    seed,
     key: keyPair.publicKey.toString('hex'),
     opts: { bootstrap: opts.bootstrap || null },
     deleted_at: null,
@@ -45,7 +49,10 @@ async function createSwarm (db, opts = {}) {
   const { name } = opts
   const kebabName = toKebabCase(name)
   if ((await db.getDetails({ name: kebabName })).length) throw new Error('Resource name is not unique!')
-  const keyPair = opts.getKeyPair ? opts.getKeyPair(kebabName) : generateChildKeyPair(Memory.getSeed(), kebabName)
+
+  const { seed, keyPair } = opts.getKeyPair
+    ? opts.getKeyPair(kebabName)
+    : { seed: null, keyPair: generateChildKeyPair(Memory.getSeed(), kebabName) }
 
   delete opts.name
   const details = {
@@ -53,6 +60,7 @@ async function createSwarm (db, opts = {}) {
     title: toTitleCase(name),
     name: kebabName,
     resource: 'hyperswarm',
+    seed,
     key: keyPair.publicKey.toString('hex'),
     opts,
     deleted_at: null,
