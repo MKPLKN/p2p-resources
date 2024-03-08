@@ -1,6 +1,8 @@
 # p2p-resources
 > This is an experimental package and is subject to changes, including breaking changes.
 
+> 02/2024 @TODO [`p2p-auth 2.0`](https://github.com/MKPLKN/p2p-auth) switched to [`Keypear`](https://github.com/holepunchto/keypear), which allows simplifying many of this package's functionalities.
+
 ## A Brief Overview
 
 The package has an `initMasterComponents` function that creates [`Hypercore`](https://github.com/holepunchto/hypercore) and [`Hyperbee`](https://github.com/holepunchto/hyperbee) based on the authenticated user (authenticated user = KeyPair in memory, handled by [`p2p-auth`](https://github.com/MKPLKN/p2p-auth)).
